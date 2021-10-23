@@ -1,0 +1,60 @@
+version: "3.5"
+
+services:
+
+##36002 - db
+  postgresdb:
+    image: postgres:12
+    ports:
+      - "36002:5432"
+    restart: always
+    volumes:
+      - db_volume:/var/lib/postgres/data
+    environment:
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "admin"
+      POSTGRES_DB: "exchanges"
+    container_name: db
+    networks: 
+      - exchange
+
+##36003 - db-pgadmin
+  dbpgadmin:
+    image: dpage/pgadmin4:4.15
+    ports:
+      - "36003:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@exchange"
+      PGADMIN_DEFAULT_PASSWORD: "admin"
+    container_name: pgadmin
+    volumes:
+      - pg_volume:/var/lib/pgadmin
+    networks: 
+      - exchange
+
+##36101 - exchange
+  exchange:
+    image: exchange/exchange
+    build:
+      context: ./../exchange
+      dockerfile: ./Dockerfile
+    container_name: exchange
+    ports:
+      - '36101:5000'
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - TZ=Turkey
+    networks:
+      - exchange
+    depends_on:
+      - postgresdb
+    restart: 
+      on-failure
+
+networks:
+  exchange:
+    name: exchange-network
+
+volumes:
+  db_volume:
+  pg_volume:
