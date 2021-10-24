@@ -25,7 +25,7 @@ This project has been developed like a microservice architecture but just includ
 ## About
 - [PostgreSQL DB](http://localhost:36002) is running on   `localhost:36002`
 - [PgAdmin for PostgreSQL](http://localhost:36003/) is running on `localhost:36003` with `username:admin@exchange` `password:admin`
-- [User](http://localhost:36101/swagger) is running on `localhost:36101`
+- [Exchange](http://localhost:36101/swagger) is running on `localhost:36101`
 
 ## Test
   ![image](https://user-images.githubusercontent.com/38660944/138569478-6e167dd8-112a-44ee-ac33-e04a88381f95.png)
