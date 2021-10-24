@@ -28,13 +28,13 @@ This project has been developed like a microservice architecture but just includ
 - [Exchange](http://localhost:36101/swagger) is running on `localhost:36101`
 
 ## Test
-  ![image](https://user-images.githubusercontent.com/38660944/138569478-6e167dd8-112a-44ee-ac33-e04a88381f95.png)
+  ![image](https://user-images.githubusercontent.com/38660944/138587898-987a7740-9b87-4fe1-84aa-c8c4d1a356da.png)
   - This is the first Api which return all last currencies in this system. Also we can sort fields.
 ---------------------
-  ![image](https://user-images.githubusercontent.com/38660944/138569552-fff2013e-d7c6-4a8b-b070-45298e4dd6b2.png)
+  ![image](https://user-images.githubusercontent.com/38660944/138587913-89cfcda1-790e-4df8-869a-a3d7059aee90.png)
   - The second one is return all selected code's currency day by day.
 ---------------------
-  ![image](https://user-images.githubusercontent.com/38660944/138569592-d45c5a54-e832-4d04-a82f-842b6e0c86ce.png)
+  ![image](https://user-images.githubusercontent.com/38660944/138587932-f551a8f9-1b62-4873-8f5a-4dd12d2e23db.png)
   - The last api is an extra method. Because this method triggers beginning of hours for all day between 9am - 18pm by Hangfire. But when we need some real datas from service, we can use this api for our tests.  
 
 
