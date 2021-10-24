@@ -28,6 +28,8 @@ namespace Exchange.Core.Services
 
         private readonly IMapper _mapper;
 
+        private const string _sortingField = "rate";
+
         public CurrencyService(IConfiguration configuration, ApplicationContext dbContext, ILogger<CurrencyService> logger, IMapper mapper)
         {
             _configuration = configuration;
@@ -80,18 +82,19 @@ namespace Exchange.Core.Services
         {
             var result = new List<DailyRateDto>();
 
-            var dailyRates = (await _dbContext.DailyRates.ToListAsync())
-                                                         .GroupBy(x => x.Code)
-                                                         .Select(group => new DailyRate()
-                                                         {
-                                                             Code = group.Key,
-                                                             CreatedOn = group.OrderByDescending(x => x.CreatedOn).First().CreatedOn,
-                                                             CurrencyName = group.OrderByDescending(x => x.CreatedOn).First().CurrencyName,
-                                                             Id = group.OrderByDescending(x => x.CreatedOn).First().Id,
-                                                             Name = group.OrderByDescending(x => x.CreatedOn).First().Name,
-                                                             Rate = group.OrderByDescending(x => x.CreatedOn).First().Rate,
-                                                             UpdatedOn = group.OrderByDescending(x => x.UpdatedOn).First().UpdatedOn
-                                                         }).ToList();
+            var dailyRates = await _dbContext.DailyRates.Select(x => x.Code)
+                                                        .Distinct()
+                                                        .SelectMany(x => _dbContext.DailyRates.Where(c => c.Code == x).OrderByDescending(c => c.CreatedOn).Take(1))
+                                                        .Select(group => new DailyRate()
+                                                        {
+                                                            Code = group.Code,
+                                                            CreatedOn = group.CreatedOn,
+                                                            CurrencyName = group.CurrencyName,
+                                                            Id = group.Id,
+                                                            Name = group.Name,
+                                                            Rate = group.Rate,
+                                                            UpdatedOn = group.UpdatedOn
+                                                        }).ToListAsync();
 
             if (dailyRates.Count == 0)
             {
@@ -105,19 +108,20 @@ namespace Exchange.Core.Services
 
         public async Task<List<CurrencyRateDto>> GetCurrencyRatesAsync(GetCurrencyRatesQuery query)
         {
-            var rates = (await _dbContext.DailyRates.Where(x => x.Code == query.Code.ToUpper())
-                                                    .ToListAsync())
-                                                    .GroupBy(x => x.CreatedOn.Date)
-                                                    .Select(group => new DailyRate()
-                                                    {
-                                                        CreatedOn = group.Key,
-                                                        Code = group.OrderByDescending(x => x.CreatedOn).First().Code,
-                                                        CurrencyName = group.OrderByDescending(x => x.CreatedOn).First().CurrencyName,
-                                                        Id = group.OrderByDescending(x => x.CreatedOn).First().Id,
-                                                        Name = group.OrderByDescending(x => x.CreatedOn).First().Name,
-                                                        Rate = group.OrderByDescending(x => x.CreatedOn).First().Rate,
-                                                        UpdatedOn = group.OrderByDescending(x => x.UpdatedOn).First().UpdatedOn
-                                                    }).ToList();
+            var rates = await _dbContext.DailyRates.Where(x => x.Code == query.Code.ToUpper())
+                                                   .Select(x => x.CreatedOn.Date)
+                                                   .Distinct()
+                                                   .SelectMany(x => _dbContext.DailyRates.Where(c => c.Code == query.Code.ToUpper() && c.CreatedOn.Date == x).OrderByDescending(c => c.CreatedOn).Take(1))
+                                                   .Select(group => new DailyRate()
+                                                   {
+                                                       Code = group.Code,
+                                                       CreatedOn = group.CreatedOn,
+                                                       CurrencyName = group.CurrencyName,
+                                                       Id = group.Id,
+                                                       Name = group.Name,
+                                                       Rate = group.Rate,
+                                                       UpdatedOn = group.UpdatedOn
+                                                   }).ToListAsync();
 
             if (rates.Count == 0)
             {
@@ -130,7 +134,7 @@ namespace Exchange.Core.Services
 
         private List<DailyRateDto> SortingList(List<DailyRateDto> list, string sortingField, bool sortingAsc)
         {
-            if (string.IsNullOrEmpty(sortingField) || sortingField?.ToLower() != "rate")
+            if (string.IsNullOrEmpty(sortingField) || sortingField?.ToLower() != _sortingField)
             {
                 list = sortingAsc == false ? list.OrderByDescending(x => x.Code).ToList() : list.OrderBy(x => x.Code).ToList();
             }

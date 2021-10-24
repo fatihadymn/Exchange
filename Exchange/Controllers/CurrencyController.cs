@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Exchange.Controllers
 {
-    [Route("api/currency/v1/currencies")]
+    [Route("api/exchange/v1/currencies")]
     public class CurrencyController : ControllerBase
     {
         private readonly ICurrencyService _currencyService;
