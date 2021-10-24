@@ -28,8 +28,6 @@ namespace Exchange.Core.Services
 
         private readonly IMapper _mapper;
 
-        private const string _sortingField = "rate";
-
         public CurrencyService(IConfiguration configuration, ApplicationContext dbContext, ILogger<CurrencyService> logger, IMapper mapper)
         {
             _configuration = configuration;
@@ -134,13 +132,13 @@ namespace Exchange.Core.Services
 
         private List<DailyRateDto> SortingList(List<DailyRateDto> list, string sortingField, bool sortingAsc)
         {
-            if (string.IsNullOrEmpty(sortingField) || sortingField?.ToLower() != _sortingField)
+            if (string.IsNullOrEmpty(sortingField) || sortingField?.ToLower() != ExchangeConstants.SortingField)
             {
-                list = sortingAsc == false ? list.OrderByDescending(x => x.Code).ToList() : list.OrderBy(x => x.Code).ToList();
+                list = !sortingAsc ? list.OrderByDescending(x => x.Code).ToList() : list.OrderBy(x => x.Code).ToList();
             }
             else
             {
-                list = sortingAsc == false ? list.OrderByDescending(x => x.Rate).ToList() : list.OrderBy(x => x.Rate).ToList();
+                list = !sortingAsc ? list.OrderByDescending(x => x.Rate).ToList() : list.OrderBy(x => x.Rate).ToList();
             }
 
             return list;
